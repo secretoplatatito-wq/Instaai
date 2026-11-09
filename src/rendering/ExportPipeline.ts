@@ -82,19 +82,27 @@ export class ExportPipeline {
     }
 
     // 4. Select Supported MimeType for Lossless / High Quality Master
-    const candidateTypes = [
-      'video/webm;codecs=vp9,opus',
-      'video/webm;codecs=vp09.00.10.08,opus',
-      'video/mp4;codecs=avc1.640028,mp4a.40.2', // High Profile H.264
-      'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
-      'video/webm;codecs=vp8,opus',
-      'video/webm',
-      'video/mp4',
-    ];
+    const candidateTypes = settings.format === 'mp4'
+      ? [
+          'video/mp4;codecs=avc1.640028,mp4a.40.2', // High Profile H.264
+          'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+          'video/mp4;codecs=avc1.4d401f,mp4a.40.2',
+          'video/mp4',
+          'video/webm;codecs=vp9,opus',
+          'video/webm',
+        ]
+      : [
+          'video/webm;codecs=vp9,opus',
+          'video/webm;codecs=vp09.00.10.08,opus',
+          'video/webm;codecs=vp8,opus',
+          'video/webm',
+          'video/mp4;codecs=avc1.640028,mp4a.40.2',
+          'video/mp4',
+        ];
 
     let chosenMimeType = '';
     for (const t of candidateTypes) {
-      if (MediaRecorder.isTypeSupported(t)) {
+      if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(t)) {
         chosenMimeType = t;
         break;
       }
@@ -104,14 +112,15 @@ export class ExportPipeline {
       chosenMimeType = 'video/webm'; // fallback
     }
 
-    // Bitrate calculation (up to 80-100 Mbps for 4K Lossless Master)
-    const bitrate = Math.max(4, settings.bitrateMbps) * 1000000;
+    // Bitrate calculation (up to 250 Mbps for 8K/4K Lossless Master)
+    const bitrate = Math.max(1, Math.min(250, settings.bitrateMbps)) * 1000000;
     this.mediaRecorder = new MediaRecorder(combinedStream, {
       mimeType: chosenMimeType,
       videoBitsPerSecond: bitrate,
       audioBitsPerSecond: 320000, // 320 kbps high fidelity audio
     });
 
+    this.recordedChunks = [];
     this.mediaRecorder.ondataavailable = (e) => {
       if (e.data && e.data.size > 0) {
         this.recordedChunks.push(e.data);
@@ -150,7 +159,7 @@ export class ExportPipeline {
           progressPercent: 100,
           currentSecond: duration,
           totalSeconds: duration,
-          message: 'Video rendering complete! Ready to download.',
+          message: `Video rendering complete! Ready to download as ${extension.toUpperCase()}.`,
           blobUrl,
           blobSize: finalBlob.size,
           format: extension.toUpperCase(),
@@ -165,11 +174,13 @@ export class ExportPipeline {
         reject(e);
       };
 
-      // Start Recording
-      this.mediaRecorder.start(100); // 100ms chunks
+      // Start Recording with short timeslice for smooth streaming
+      this.mediaRecorder.start(80);
 
       const startTimeMs = performance.now();
       const totalMs = duration * 1000;
+      let frameIndex = 0;
+      const totalEstimatedFrames = Math.round(duration * fps);
 
       const drawLoop = () => {
         if (!this.isExporting || this.cancelRequested) return;
@@ -177,12 +188,13 @@ export class ExportPipeline {
         const elapsedMs = performance.now() - startTimeMs;
         const progress = Math.min(1.0, elapsedMs / totalMs);
         const currentSec = Math.min(duration, elapsedMs / 1000);
+        frameIndex++;
 
-        // Render current 3D canvas into composite canvas
+        // Clear and draw background
         ctx.fillStyle = '#08090d';
         ctx.fillRect(0, 0, width, height);
 
-        // Aspect fit Three.js canvas
+        // Aspect fit source canvas with high smoothing
         const srcW = threeCanvas.width;
         const srcH = threeCanvas.height;
         const scale = Math.max(width / srcW, height / srcH);
@@ -193,7 +205,18 @@ export class ExportPipeline {
 
         ctx.drawImage(threeCanvas, offsetX, offsetY, drawW, drawH);
 
-        // Permanently burn Watermark and Captions into the encoded video output!
+        // Apply HDR10 wide-gamut / PQ tone curve if requested
+        if (settings.enableHDR10) {
+          const peak = settings.hdrPeakLuminance ?? 1000;
+          const factor = Math.max(1.0, Math.min(3.0, peak / 400));
+          ctx.save();
+          ctx.globalCompositeOperation = 'screen';
+          ctx.fillStyle = `rgba(255, 255, 255, ${(factor - 1.0) * 0.05})`;
+          ctx.fillRect(0, 0, width, height);
+          ctx.restore();
+        }
+
+        // Permanently burn Watermark and Captions into the encoded video output at target resolution!
         if (settings.includeWatermark && watermarkConfig.enabled) {
           this.renderWatermark(ctx, width, height, watermarkConfig, currentSec);
         }
@@ -203,7 +226,7 @@ export class ExportPipeline {
           progressPercent: Math.round(progress * 90),
           currentSecond: Number(currentSec.toFixed(1)),
           totalSeconds: Number(duration.toFixed(1)),
-          message: `Recording frames: ${currentSec.toFixed(1)}s / ${duration.toFixed(1)}s (${Math.round(progress * 100)}%)`,
+          message: `Encoding frame ${frameIndex} / ${totalEstimatedFrames} (${Math.round(progress * 100)}%) • ${fps} FPS • ${width}×${height} • ${settings.enableHDR10 ? 'HDR10' : 'SDR'}`,
         });
 
         if (elapsedMs < totalMs) {

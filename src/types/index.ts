@@ -15,7 +15,12 @@ export type Sandbox2DType =
   | 'wedge-escape' // "At what size will the ball escape?" shrinking ball in V-wedge with pixel radius counter
   | 'multiplier-overload' // 1 Ball vs 10,000 exponential ball cascading cascade with live floor counters
   | 'branching-waves' // XY coordinate axis branching into multi-harmonic audio frequency waveforms
-  | 'landmark-flask'; // Falling icon silhouettes / spheres bouncing into glass flask on beat drops
+  | 'landmark-flask' // Falling icon silhouettes / spheres bouncing into glass flask on beat drops
+  | 'egg-pi' // 3Blue1Brown/Eulerism elastic collision simulator calculating digits of π (3, 31, 314, 3141)
+  | 'planet-flask' // Solar system scale Erlenmeyer flask drop (Mercury to Jupiter to Black Hole)
+  | 'spring-smash' // Hydraulic spring piston smash doubling eggs and bursting particles
+  | 'bands-broken' // 1000°C glowing hot ball burning through 200 tension bands with live thermometer
+  | 'spirograph-flower'; // Circular spirograph song guesser drawing harmonic hypocycloid flower trails
 
 export type CameraMode =
   | 'follow' // Follow lead sphere/projectile along track
@@ -67,6 +72,15 @@ export interface BiomeConfig {
   backgroundBrightness: number; // 0 to 0.3
 }
 
+export interface ScratchRuleBlock {
+  id: string;
+  event: 'on_wall_hit' | 'on_floor_hit' | 'on_beat' | 'on_collision' | 'on_timer';
+  action: 'multiply_ball' | 'shrink_radius' | 'grow_radius' | 'play_chord' | 'add_score' | 'invert_gravity' | 'spawn_burst';
+  value: number;
+  enabled: boolean;
+  label?: string;
+}
+
 export interface Sandbox2DConfig {
   type: Sandbox2DType;
   headlineText: string;
@@ -82,6 +96,11 @@ export interface Sandbox2DConfig {
   showLiveMetrics: boolean;
   laserReflectionCount: number;
   multiplierTarget: number;
+  temperatureCelsius?: number; // 100 to 1000 C for bands-broken
+  piMassRatioPower?: number; // 1 (hits=3), 2 (hits=31), 4 (hits=314), 6 (hits=3141)
+  pistonSpeed?: number; // 0.5 to 3.0 for spring-smash
+  customSubtext?: string;
+  scratchRules?: ScratchRuleBlock[];
 }
 
 export interface AudioReactiveConfig {
@@ -122,14 +141,17 @@ export interface CameraConfig {
 export interface ExportSettings {
   aspectRatio: AspectRatio;
   resolution: { width: number; height: number; label: string };
-  fps: 24 | 30 | 60;
+  fps: 24 | 30 | 60 | 120 | 240;
   quality: 'fast' | 'high' | 'ultra' | 'lossless';
   bitrateMbps: number;
   startTime: number;
   endTime: number;
   includeWatermark: boolean;
   includeCaptions: boolean;
-  format: 'webm' | 'mp4';
+  format: 'mp4' | 'webm';
+  enableHDR10?: boolean;
+  hdrPeakLuminance?: number; // 100 to 1000 nits
+  deterministicFrameRender?: boolean; // Offline frame-by-frame rendering
 }
 
 export interface ProjectData {

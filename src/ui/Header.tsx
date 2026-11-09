@@ -11,6 +11,7 @@ import {
   Square,
   Monitor,
   RefreshCw,
+  Bot,
 } from 'lucide-react';
 import { AspectRatio, AudioTrackInfo, BiomeType, StudioMode, Sandbox2DType } from '../types';
 import { BIOME_REGISTRY } from '../biomes/BiomeRegistry';
@@ -27,6 +28,7 @@ interface HeaderProps {
   onOpenUpload: () => void;
   onOpenExport: () => void;
   onOpenProjects: () => void;
+  onOpenMcp: () => void;
   onLoadPreset: (presetId: string) => void;
   onRandomizeSeed: () => void;
 }
@@ -42,6 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenUpload,
   onOpenExport,
   onOpenProjects,
+  onOpenMcp,
   onLoadPreset,
   onRandomizeSeed,
 }) => {
@@ -50,6 +53,11 @@ export const Header: React.FC<HeaderProps> = ({
     'ellipse-laser': 'Ellipse Laser Chord Harp',
     'wedge-escape': 'V-Wedge Escape Funnel',
     'multiplier-overload': '1 Ball vs 10,000 Multiplier',
+    'egg-pi': 'Egg π Collision (Eulerism)',
+    'planet-flask': 'Planet Scale Flask Drop',
+    'spring-smash': 'Hydraulic Piston Egg Smash',
+    'bands-broken': '1000°C Ball vs 200 Bands',
+    'spirograph-flower': 'Spirograph Song Guesser',
     'branching-waves': 'Harmonic Branching Axis',
     'landmark-flask': 'Landmark Physics Flask',
   };
@@ -196,9 +204,19 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onOpenProjects}
           title="Saved Projects"
-          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition"
+          className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition cursor-pointer"
         >
           <FolderOpen className="w-4 h-4" />
+        </button>
+
+        {/* AI & MCP API Button */}
+        <button
+          onClick={onOpenMcp}
+          title="Connect AI via Model Context Protocol (MCP)"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-cyan-950/40 hover:bg-cyan-900/40 text-cyan-300 border border-cyan-500/30 text-xs font-semibold transition cursor-pointer"
+        >
+          <Bot className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="hidden md:inline">AI / MCP</span>
         </button>
 
         {/* Export Video Button */}

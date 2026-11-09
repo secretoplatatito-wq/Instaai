@@ -345,6 +345,17 @@ export class SceneEngine {
     this.camera.lookAt(this.currentLookAt);
   }
 
+  public renderFrame(
+    time: number,
+    delta: number,
+    metrics: AudioMetrics,
+    config: BiomeConfig,
+    reactiveConfig: AudioReactiveConfig
+  ) {
+    this.stepScene(delta, time, metrics, config, reactiveConfig);
+    this.renderer.render(this.scene, this.camera);
+  }
+
   public dispose() {
     this.stopAnimation();
     if (this.activeBiome) {

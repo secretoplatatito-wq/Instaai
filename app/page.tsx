@@ -23,7 +23,8 @@ import {
   StudioMode,
   Sandbox2DConfig,
 } from '../src/types';
-import { INITIAL_PROJECT, ProjectStore, DEFAULT_PRESETS } from '../src/editor/ProjectStore';
+import { INITIAL_PROJECT, ProjectStore, DEFAULT_PRESETS, DEFAULT_SANDBOX_CONFIG } from '../src/editor/ProjectStore';
+import { McpApiModal } from '../src/ui/McpApiModal';
 
 export default function BiomeBeatStudio() {
   // Project & Configuration State
@@ -63,6 +64,7 @@ export default function BiomeBeatStudio() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
+  const [isMcpOpen, setIsMcpOpen] = useState(false);
 
   // Export Progress State
   const [exportProgress, setExportProgress] = useState<ExportProgress>({
@@ -467,13 +469,14 @@ export default function BiomeBeatStudio() {
         studioMode={project.studioMode}
         onSetStudioMode={handleSetStudioMode}
         activeBiomeType={project.biomeType}
-        sandboxType={project.sandboxConfig.type}
+        sandboxType={project.sandboxConfig?.type ?? 'ellipse-laser'}
         aspectRatio={project.exportSettings.aspectRatio}
         onSetAspectRatio={handleSetAspectRatio}
         trackInfo={project.trackInfo}
         onOpenUpload={() => setIsUploadOpen(true)}
         onOpenExport={() => setIsExportOpen(true)}
         onOpenProjects={() => setIsProjectsOpen(true)}
+        onOpenMcp={() => setIsMcpOpen(true)}
         onLoadPreset={handleLoadPreset}
         onRandomizeSeed={handleRandomizeSeed}
       />
@@ -524,7 +527,7 @@ export default function BiomeBeatStudio() {
         onSelectBiome={handleSelectBiome}
         biomeConfig={project.biomeConfig}
         onChangeBiomeConfig={handleChangeBiomeConfig}
-        sandboxConfig={project.sandboxConfig}
+        sandboxConfig={project.sandboxConfig || DEFAULT_SANDBOX_CONFIG}
         onChangeSandboxConfig={handleChangeSandboxConfig}
         onResetSandbox={handleResetSandbox}
         reactiveConfig={project.audioReactiveConfig}
@@ -602,6 +605,8 @@ export default function BiomeBeatStudio() {
         savedProjects={savedProjects}
         onRefreshProjects={() => setSavedProjects(ProjectStore.getSavedProjects())}
       />
+
+      <McpApiModal isOpen={isMcpOpen} onClose={() => setIsMcpOpen(false)} />
     </main>
   );
 }

@@ -41,14 +41,17 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   const isCompleted = progress.status === 'completed';
 
   const resolutions: { label: string; width: number; height: number; aspect: AspectRatio; desc: string; badge?: string }[] = [
-    { label: '4K Ultra HD (2160 × 3840)', width: 2160, height: 3840, aspect: '9:16', desc: 'Lossless Master for YouTube Shorts & TikTok', badge: 'ULTRA HD' },
+    { label: '8K Ultra Vertical (4320 × 7680)', width: 4320, height: 7680, aspect: '9:16', desc: 'Maximum 8K Lossless Vertical Master', badge: '8K ULTRA' },
+    { label: '4K Ultra HD (2160 × 3840)', width: 2160, height: 3840, aspect: '9:16', desc: 'Lossless Master for YouTube Shorts & TikTok', badge: '4K UHD' },
     { label: '2K QHD (1440 × 2560)', width: 1440, height: 2560, aspect: '9:16', desc: 'Crisp high-density vertical rendering', badge: '2K QHD' },
     { label: '1080 × 1920 Full HD', width: 1080, height: 1920, aspect: '9:16', desc: 'Standard Reels, TikTok, Shorts (60 FPS)', badge: 'STANDARD' },
-    { label: '720 × 1280 HD', width: 720, height: 1280, aspect: '9:16', desc: 'Lightweight & instant preview export' },
-    { label: '4K Square (2160 × 2160)', width: 2160, height: 2160, aspect: '1:1', desc: 'Ultra-resolution Instagram post' },
+    { label: '720 × 1280 HD', width: 720, height: 1280, aspect: '9:16', desc: 'Lightweight & fast preview export' },
+    { label: '8K Square (4320 × 4320)', width: 4320, height: 4320, aspect: '1:1', desc: 'Ultra-resolution 8K Square master', badge: '8K' },
+    { label: '4K Square (2160 × 2160)', width: 2160, height: 2160, aspect: '1:1', desc: 'High-res Instagram square post' },
     { label: '1080 × 1080 Square', width: 1080, height: 1080, aspect: '1:1', desc: 'Standard Instagram feed square' },
+    { label: '8K Cinema (7680 × 4320)', width: 7680, height: 4320, aspect: '16:9', desc: '8K Widescreen Master for YouTube', badge: '8K' },
     { label: '4K Cinema (3840 × 2160)', width: 3840, height: 2160, aspect: '16:9', desc: 'Widescreen 4K Master for YouTube' },
-    { label: '1920 × 1080 Landscape', width: 1920, height: 1080, aspect: '16:9', desc: 'Standard widescreen HD' },
+    { label: '1920 × 1080 Landscape', width: 1920, height: 1080, aspect: '16:9', desc: 'Standard widescreen Full HD' },
   ];
 
   return (
@@ -62,10 +65,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             </div>
             <div>
               <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <span>Export Viral Video Reel</span>
-                <span className="text-[10px] bg-cyan-500/20 text-cyan-400 px-1.5 py-0.5 rounded font-mono font-semibold">4K LOSSLESS</span>
+                <span>Export Viral Video Master</span>
+                <span className="text-[10px] bg-cyan-500/20 text-cyan-400 px-1.5 py-0.5 rounded font-mono font-semibold">8K/4K MP4 HDR10</span>
               </h2>
-              <p className="text-xs text-gray-400">High-bitrate studio rendering with synchronized soundtrack & branding</p>
+              <p className="text-xs text-gray-400">Frame-by-frame high-bitrate studio rendering with synchronized soundtrack & branding</p>
             </div>
           </div>
           {!isRendering && (
@@ -87,7 +90,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                 <label className="text-xs font-semibold text-gray-300 uppercase tracking-wider block mb-2">
                   Target Resolution & Aspect Ratio:
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-44 overflow-y-auto pr-1">
                   {resolutions.map((r) => {
                     const isSelected = settings.resolution.width === r.width && settings.resolution.height === r.height;
                     return (
@@ -129,12 +132,31 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                 </div>
               </div>
 
-              {/* Frame Rate & Bitrate Controls */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              {/* Format, Frame Rate & Bitrate Controls */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                {/* Format selection */}
                 <div>
-                  <label className="text-gray-400 block mb-1 font-medium">Frame Rate</label>
+                  <label className="text-gray-400 block mb-1 font-medium">Container Format</label>
                   <div className="flex rounded-lg bg-black/40 border border-white/10 p-1">
-                    {([24, 30, 60] as const).map((fps) => (
+                    {(['mp4', 'webm'] as const).map((fmt) => (
+                      <button
+                        key={fmt}
+                        onClick={() => onChangeSettings({ format: fmt })}
+                        className={`flex-1 py-1 rounded text-xs font-semibold transition cursor-pointer uppercase ${
+                          settings.format === fmt ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Framerate Selection */}
+                <div className="sm:col-span-2">
+                  <label className="text-gray-400 block mb-1 font-medium">Frame Rate (FPS)</label>
+                  <div className="flex rounded-lg bg-black/40 border border-white/10 p-1">
+                    {([24, 30, 60, 120, 240] as const).map((fps) => (
                       <button
                         key={fps}
                         onClick={() => onChangeSettings({ fps })}
@@ -142,33 +164,71 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                           settings.fps === fps ? 'bg-cyan-500 text-black' : 'text-gray-400 hover:text-white'
                         }`}
                       >
-                        {fps} FPS
+                        {fps}
                       </button>
                     ))}
                   </div>
+                </div>
+              </div>
+
+              {/* Bitrate Control (up to 250 Mbps) */}
+              <div className="p-3 bg-black/40 border border-white/10 rounded-xl space-y-2 text-xs">
+                <div className="flex justify-between items-center text-gray-300">
+                  <span className="font-medium">Video Encoding Bitrate:</span>
+                  <span className="font-mono text-cyan-400 font-bold">{settings.bitrateMbps} Mbps</span>
+                </div>
+                <input
+                  type="range"
+                  min="4"
+                  max="250"
+                  step="2"
+                  value={settings.bitrateMbps}
+                  onChange={(e) => onChangeSettings({ bitrateMbps: parseInt(e.target.value) })}
+                  className="w-full h-1 bg-white/10 rounded cursor-pointer"
+                />
+                <div className="flex justify-between text-[10px] text-gray-400">
+                  <span>Standard (12 Mbps)</span>
+                  <span>4K Lossless (80 Mbps)</span>
+                  <span>8K Master (250 Mbps)</span>
+                </div>
+              </div>
+
+              {/* HDR10 Mode & Luminance */}
+              <div className="p-3 bg-gradient-to-r from-purple-950/20 to-cyan-950/20 border border-purple-500/20 rounded-xl space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-gray-200 cursor-pointer font-medium">
+                    <input
+                      type="checkbox"
+                      checked={settings.enableHDR10 ?? false}
+                      onChange={(e) => onChangeSettings({ enableHDR10: e.target.checked })}
+                      className="rounded bg-black/40 border-white/20 text-purple-500 focus:ring-0"
+                    />
+                    <span>HDR10 Output (ST 2084 PQ Wide Color Gamut)</span>
+                  </label>
+                  {settings.enableHDR10 && (
+                    <span className="font-mono text-purple-300 text-[11px] font-bold">
+                      {settings.hdrPeakLuminance ?? 1000} Nits
+                    </span>
+                  )}
                 </div>
 
-                <div>
-                  <label className="text-gray-400 block mb-1 font-medium">Quality & Bitrate</label>
-                  <div className="flex rounded-lg bg-black/40 border border-white/10 p-1">
-                    {[
-                      { mbps: 8, label: 'Fast (8M)', quality: 'fast' as const },
-                      { mbps: 20, label: 'High (20M)', quality: 'high' as const },
-                      { mbps: 45, label: 'Ultra (45M)', quality: 'ultra' as const },
-                      { mbps: 80, label: 'Lossless (80M)', quality: 'lossless' as const },
-                    ].map((b) => (
-                      <button
-                        key={b.mbps}
-                        onClick={() => onChangeSettings({ bitrateMbps: b.mbps, quality: b.quality })}
-                        className={`flex-1 py-1 rounded text-[10px] font-semibold transition cursor-pointer ${
-                          settings.bitrateMbps === b.mbps ? 'bg-cyan-500 text-black' : 'text-gray-400 hover:text-white'
-                        }`}
-                      >
-                        {b.label}
-                      </button>
-                    ))}
+                {settings.enableHDR10 && (
+                  <div className="pt-1">
+                    <div className="flex justify-between text-[10px] text-gray-400 mb-1">
+                      <span>Peak Specular Luminance:</span>
+                      <span>{settings.hdrPeakLuminance ?? 1000} Nits (100 - 1000)</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="100"
+                      max="1000"
+                      step="50"
+                      value={settings.hdrPeakLuminance ?? 1000}
+                      onChange={(e) => onChangeSettings({ hdrPeakLuminance: parseInt(e.target.value) })}
+                      className="w-full h-1 bg-white/10 rounded cursor-pointer"
+                    />
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Watermark & Captions check */}
@@ -180,10 +240,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                     onChange={(e) => onChangeSettings({ includeWatermark: e.target.checked })}
                     className="rounded bg-black/40 border-white/20 text-cyan-500 focus:ring-0"
                   />
-                  <span>Burn-in Watermark & Creator Branding into video output</span>
+                  <span>Burn-in Watermark & Creator Branding at native output resolution</span>
                 </label>
                 <div className="text-[11px] text-gray-400">
-                  Export duration: <span className="font-mono text-cyan-400">{Math.round(settings.endTime - settings.startTime)}s</span> • Audio soundtrack synchronized
+                  Export duration: <span className="font-mono text-cyan-400">{Math.round(settings.endTime - settings.startTime)}s</span> • Synchronized audio soundtrack
                 </div>
               </div>
             </>

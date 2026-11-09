@@ -82,6 +82,11 @@ export const BottomDock: React.FC<BottomDockProps> = ({
     { id: 'ellipse-laser', title: 'Ellipse Laser Harp', subtitle: 'Reflecting laser chords between foci', iconColor: '#00f2fe' },
     { id: 'wedge-escape', title: 'V-Wedge Escape Funnel', subtitle: 'Shrinking bouncing ball radius challenge', iconColor: '#ff6b35' },
     { id: 'multiplier-overload', title: '1 vs 10k Multiplier', subtitle: 'Exponential ball cascade & floor counters', iconColor: '#a855f7' },
+    { id: 'egg-pi', title: 'Egg π Elastic Collision', subtitle: 'Eulerism / 3B1B collisions calculate π digits', iconColor: '#38bdf8' },
+    { id: 'planet-flask', title: 'Planet Scale Flask Drop', subtitle: 'Mercury to Jupiter to Black Hole flask drop', iconColor: '#fbbf24' },
+    { id: 'spring-smash', title: 'Piston Egg Smash x2', subtitle: 'Hydraulic piston smash doubling eggs', iconColor: '#eab308' },
+    { id: 'bands-broken', title: '1000°C Ball vs 200 Bands', subtitle: 'Glowing hot sphere burning tension bands', iconColor: '#ff4444' },
+    { id: 'spirograph-flower', title: 'Spirograph Song Guesser', subtitle: 'Harmonic floral trails with song guessing badge', iconColor: '#ec4899' },
     { id: 'branching-waves', title: 'Harmonic Wave Axis', subtitle: 'Multi-frequency branching sine curves', iconColor: '#f43f5e' },
     { id: 'landmark-flask', title: 'Landmark Physics Flask', subtitle: 'Falling crystal icons on musical beats', iconColor: '#ffd166' },
   ];
@@ -219,6 +224,11 @@ export const BottomDock: React.FC<BottomDockProps> = ({
                         'ellipse-laser': 'Can laser chords strike every node?',
                         'wedge-escape': 'At what size will the ball escape?',
                         'multiplier-overload': '1 Ball vs 10,000 Multiplier Overload',
+                        'egg-pi': 'Colliding blocks calculate π',
+                        'planet-flask': 'Dropping planets until the flask bursts!',
+                        'spring-smash': 'Hydraulic Piston vs Doubling Eggs',
+                        'bands-broken': '1000°C Red-Hot Ball vs 200 Bands',
+                        'spirograph-flower': 'GUESS THE SONG FROM THE TRAIL? 🎵',
                         'branching-waves': 'Harmonic Wave Coordinate Resonance',
                         'landmark-flask': 'Filling the flask with music beats 🧪',
                       };

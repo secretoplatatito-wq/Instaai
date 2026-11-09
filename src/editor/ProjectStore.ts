@@ -277,6 +277,150 @@ export const DEFAULT_PRESETS: { id: string; name: string; description: string; d
       },
     },
   },
+  {
+    id: 'preset-egg-pi',
+    name: 'Egg π Elastic Collision Simulator (3B1B / Eulerism)',
+    description: 'Frictionless elastic block collisions with wall counting digits of π (3, 31, 314, 31415 collisions) with live hits counter.',
+    data: {
+      studioMode: '2d-sandbox',
+      sandboxConfig: {
+        ...DEFAULT_SANDBOX_CONFIG,
+        type: 'egg-pi',
+        headlineText: 'Colliding blocks calculate π',
+        counterLabel: 'π collisions',
+        speed: 1.5,
+        piMassRatioPower: 4, // 314 hits
+        colorTheme: 'rainbow',
+      },
+      watermarkConfig: {
+        enabled: true,
+        username: '@eulerism_',
+        caption: 'Why do collisions calculate π? 🤯',
+        fontFamily: 'mono',
+        fontSize: 22,
+        position: 'top-center',
+        opacity: 0.9,
+        color: '#ffffff',
+        enableGlow: false,
+        show3DInScene: false,
+      },
+    },
+  },
+  {
+    id: 'preset-planet-flask',
+    name: 'Planet Scale Erlenmeyer Flask Drop',
+    description: 'Planets from Mercury to Jupiter to Black Hole dropping into a glass flask with physical stacking and atmospheric gravity.',
+    data: {
+      studioMode: '2d-sandbox',
+      sandboxConfig: {
+        ...DEFAULT_SANDBOX_CONFIG,
+        type: 'planet-flask',
+        headlineText: 'Dropping planets until the flask bursts!',
+        counterLabel: 'celestial mass',
+        gravity: 2.4,
+        speed: 1.3,
+        colorTheme: 'cyan-orange',
+      },
+      watermarkConfig: {
+        enabled: true,
+        username: '@super_balls_3000',
+        caption: 'Can a Black Hole fit inside? 🪐',
+        fontFamily: 'sans',
+        fontSize: 24,
+        position: 'top-center',
+        opacity: 0.9,
+        color: '#ffffff',
+        enableGlow: false,
+        show3DInScene: false,
+      },
+    },
+  },
+  {
+    id: 'preset-spring-smash',
+    name: 'Hydraulic Piston Egg Smash Multiplier',
+    description: 'Oscillating heavy hydraulic piston smashing eggs into multiplying golden particles on each bass beat drop.',
+    data: {
+      studioMode: '2d-sandbox',
+      sandboxConfig: {
+        ...DEFAULT_SANDBOX_CONFIG,
+        type: 'spring-smash',
+        headlineText: 'Hydraulic Piston vs Doubling Eggs',
+        counterLabel: 'eggs crushed',
+        speed: 1.4,
+        gravity: 2.0,
+        colorTheme: 'gold-emerald',
+      },
+      watermarkConfig: {
+        enabled: true,
+        username: '@eggsimulation',
+        caption: 'Multiply by x2 on every smash 💥',
+        fontFamily: 'sans',
+        fontSize: 24,
+        position: 'top-center',
+        opacity: 0.9,
+        color: '#ffffff',
+        enableGlow: false,
+        show3DInScene: false,
+      },
+    },
+  },
+  {
+    id: 'preset-bands-broken',
+    name: '1000°C Glowing Ball vs 200 Rubber Bands',
+    description: 'Incandescent glowing sphere at 999°C melting through stretched elastic bands with live digital thermometer.',
+    data: {
+      studioMode: '2d-sandbox',
+      sandboxConfig: {
+        ...DEFAULT_SANDBOX_CONFIG,
+        type: 'bands-broken',
+        headlineText: '1000°C Red-Hot Ball vs 200 Bands',
+        counterLabel: 'temperature °C',
+        temperatureCelsius: 999,
+        speed: 1.2,
+        colorTheme: 'cyberpunk',
+      },
+      watermarkConfig: {
+        enabled: true,
+        username: '@closely_watch',
+        caption: 'Wait for the 1000°C melt drop 🔥',
+        fontFamily: 'sans',
+        fontSize: 24,
+        position: 'top-center',
+        opacity: 0.9,
+        color: '#ff4444',
+        enableGlow: true,
+        show3DInScene: false,
+      },
+    },
+  },
+  {
+    id: 'preset-spirograph-flower',
+    name: 'Spirograph Song Guesser (Hypocycloid Harmonic)',
+    description: 'Harmonic bouncing ball in circular arena drawing hypnotizing floral spirograph curves with central song guessing badge.',
+    data: {
+      studioMode: '2d-sandbox',
+      sandboxConfig: {
+        ...DEFAULT_SANDBOX_CONFIG,
+        type: 'spirograph-flower',
+        headlineText: 'GUESS THE SONG FROM THE TRAIL? 🎵',
+        counterLabel: 'petals drawn',
+        speed: 1.5,
+        colorTheme: 'rainbow',
+      },
+      watermarkConfig: {
+        enabled: true,
+        username: '@soundshapes.lab',
+        caption: 'Comment the song title below 👇',
+        fontFamily: 'sans',
+        fontSize: 22,
+        position: 'bottom-center',
+        opacity: 0.9,
+        color: '#ffffff',
+        enableGlow: false,
+        show3DInScene: false,
+      },
+    },
+  },
 ];
 
 export const INITIAL_PROJECT: ProjectData = {
@@ -362,7 +506,36 @@ export class ProjectStore {
   public static getSavedProjects(): ProjectData[] {
     try {
       const data = localStorage.getItem(this.STORAGE_KEY);
-      if (data) return JSON.parse(data);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((p) => ({
+            ...INITIAL_PROJECT,
+            ...p,
+            studioMode: p.studioMode || '3d-biome',
+            sandboxConfig: {
+              ...DEFAULT_SANDBOX_CONFIG,
+              ...(p.sandboxConfig || {}),
+            },
+            exportSettings: {
+              ...INITIAL_PROJECT.exportSettings,
+              ...(p.exportSettings || {}),
+            },
+            watermarkConfig: {
+              ...INITIAL_PROJECT.watermarkConfig,
+              ...(p.watermarkConfig || {}),
+            },
+            cameraConfig: {
+              ...INITIAL_PROJECT.cameraConfig,
+              ...(p.cameraConfig || {}),
+            },
+            biomeConfig: {
+              ...INITIAL_PROJECT.biomeConfig,
+              ...(p.biomeConfig || {}),
+            },
+          }));
+        }
+      }
     } catch {
       // fallback
     }
