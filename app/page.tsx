@@ -27,20 +27,9 @@ import { INITIAL_PROJECT, ProjectStore, DEFAULT_PRESETS, DEFAULT_SANDBOX_CONFIG 
 import { McpApiModal } from '../src/ui/McpApiModal';
 
 export default function BiomeBeatStudio() {
-  // Project & Configuration State
-  const [savedProjects, setSavedProjects] = useState<ProjectData[]>(() => {
-    if (typeof window !== 'undefined') {
-      return ProjectStore.getSavedProjects();
-    }
-    return [INITIAL_PROJECT];
-  });
-  const [project, setProject] = useState<ProjectData>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = ProjectStore.getSavedProjects();
-      return saved[0] || INITIAL_PROJECT;
-    }
-    return INITIAL_PROJECT;
-  });
+  // Project & Configuration State (deterministic SSR + post-hydration sync to prevent hydration mismatch)
+  const [savedProjects, setSavedProjects] = useState<ProjectData[]>([INITIAL_PROJECT]);
+  const [project, setProject] = useState<ProjectData>(INITIAL_PROJECT);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [volume, setVolume] = useState(0.85);
@@ -92,6 +81,28 @@ export default function BiomeBeatStudio() {
   useEffect(() => {
     projectRef.current = project;
   }, [project]);
+
+  // Hydration sync: safely restore saved projects from localStorage after initial mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const saved = ProjectStore.getSavedProjects();
+      if (saved && saved.length > 0) {
+        setSavedProjects(saved);
+        const active = saved[0];
+        setProject(active);
+        if (sceneEngineRef.current) {
+          sceneEngineRef.current.setAspectRatio(active.exportSettings.aspectRatio);
+          sceneEngineRef.current.setCameraConfig(active.cameraConfig);
+          sceneEngineRef.current.setBiome(active.biomeType, active.biomeConfig);
+        }
+        if (sandboxEngineRef.current) {
+          sandboxEngineRef.current.setAspectRatio(active.exportSettings.aspectRatio);
+          sandboxEngineRef.current.resetSimulation(active.sandboxConfig);
+        }
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Initialize Engines on mount
   useEffect(() => {

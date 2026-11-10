@@ -248,7 +248,7 @@ export const BottomDock: React.FC<BottomDockProps> = ({
                       <span className="text-xs font-bold truncate">{m.title}</span>
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: m.iconColor }} />
                     </div>
-                    <p className="text-[10px] text-gray-400 line-clamp-1">{m.subtitle}</p>
+                    <span className="block text-[10px] text-gray-400 line-clamp-1">{m.subtitle}</span>
                   </button>
                 );
               })}
@@ -388,7 +388,7 @@ export const BottomDock: React.FC<BottomDockProps> = ({
                         style={{ backgroundColor: b.defaultPrimary }}
                       />
                     </div>
-                    <p className="text-[10px] text-gray-400 line-clamp-1">{b.category}</p>
+                    <span className="block text-[10px] text-gray-400 line-clamp-1">{b.category}</span>
                   </button>
                 );
               })}

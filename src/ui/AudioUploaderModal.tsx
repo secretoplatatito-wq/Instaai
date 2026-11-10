@@ -181,7 +181,7 @@ export const AudioUploaderModal: React.FC<AudioUploaderModalProps> = ({
                         {t.bpm} BPM
                       </span>
                     </div>
-                    <p className="text-[10px] text-gray-400 line-clamp-1">{t.desc}</p>
+                    <span className="block text-[10px] text-gray-400 line-clamp-1">{t.desc}</span>
                   </button>
                 );
               })}

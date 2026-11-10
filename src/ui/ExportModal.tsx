@@ -125,7 +125,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                             </span>
                           )}
                         </div>
-                        <p className="text-[10px] text-gray-400 truncate">{r.desc}</p>
+                        <span className="block text-[10px] text-gray-400 truncate">{r.desc}</span>
                       </button>
                     );
                   })}

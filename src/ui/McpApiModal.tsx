@@ -12,10 +12,14 @@ export const McpApiModal: React.FC<McpApiModalProps> = ({ isOpen, onClose }) => 
   const [copied, setCopied] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<string | null>(null);
   const [isTesting, setIsTesting] = useState(false);
+  const origin = React.useSyncExternalStore(
+    () => () => {},
+    () => window.location.origin,
+    () => 'http://localhost:3000'
+  );
+  const endpointUrl = `${origin}/api/mcp`;
 
   if (!isOpen) return null;
-
-  const endpointUrl = typeof window !== 'undefined' ? `${window.location.origin}/api/mcp` : 'http://localhost:3000/api/mcp';
 
   const claudeDesktopConfig = JSON.stringify(
     {
